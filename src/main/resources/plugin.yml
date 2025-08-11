@@ -1,0 +1,21 @@
+name: BetterSpawnProtect
+version: '1.0.0'
+main: net.honeyberries.betterSpawnProtect.BetterSpawnProtect
+api-version: '1.21'
+authors: [ HoneyBerries ]
+description: Spawn Protection Fix for Minecraft
+website: honeyberries.net
+folia-supported: true
+commands:
+  betterspawnprotect:
+    description: Manage BetterSpawnProtect
+    usage: /betterspawnprotect <subcommand>
+    aliases: [ bsp ]
+    permission: betterspawnprotect.admin
+permissions:
+  betterspawnprotect.admin:
+    description: Allows using BetterSpawnProtect admin commands
+    default: op
+  betterspawnprotect.bypass:
+    description: Allows modifying blocks inside spawn protection
+    default: op
