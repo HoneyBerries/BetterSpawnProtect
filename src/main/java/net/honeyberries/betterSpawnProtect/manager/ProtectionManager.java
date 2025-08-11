@@ -25,26 +25,43 @@ public class ProtectionManager {
     private double radiusSq;
 
     /**
-     * Constructs a ProtectionManager with default values.
-     * Defaults to the first loaded world, center at (0.5, 64.0, 0.5),
-     * and a radius of 32.0.
+     * Constructs a ProtectionManager and loads values from config.
      */
     public ProtectionManager() {
-        this.world = Bukkit.getWorlds().isEmpty() ? null : Bukkit.getWorlds().getFirst();
-        this.cx = 0.5;
-        this.cy = 64.0;
-        this.cz = 0.5;
-        this.radius = 32.0;
+        loadFromConfig();
+    }
+
+    /**
+     * Loads protection settings from the configuration.
+     */
+    private void loadFromConfig() {
+        ConfigManager configManager = ConfigManager.getInstance();
+        if (configManager != null) {
+            this.world = configManager.getProtectionWorld();
+            this.cx = configManager.getCenterX();
+            this.cy = configManager.getCenterY();
+            this.cz = configManager.getCenterZ();
+            this.radius = configManager.getRadius();
+        } else {
+            // Fallback to defaults if config not available
+            this.world = Bukkit.getWorlds().isEmpty() ? null : Bukkit.getWorlds().getFirst();
+            this.cx = 0.5;
+            this.cy = 64.0;
+            this.cz = 0.5;
+            this.radius = 32.0;
+        }
         this.radiusSq = radius * radius;
     }
 
     /**
-     * Reloads the protection configuration.
-     * Currently obsolete but retained for compatibility with the reload command.
-     * Future implementations may load data from persistent storage.
+     * Reloads the protection configuration from file.
      */
     public void reloadFromConfig() {
-        // This method is now obsolete but is kept for compatibility with the reload command.
+        ConfigManager configManager = ConfigManager.getInstance();
+        if (configManager != null) {
+            configManager.reloadConfig();
+            loadFromConfig();
+        }
     }
 
     /**
@@ -62,7 +79,7 @@ public class ProtectionManager {
     }
 
     /**
-     * Sets the center of the protected area.
+     * Sets the center of the protected area and saves to config.
      *
      * @param newCenter The new center location.
      */
@@ -71,16 +88,29 @@ public class ProtectionManager {
         this.cx = newCenter.getX();
         this.cy = newCenter.getY();
         this.cz = newCenter.getZ();
+
+        // Save to config
+        ConfigManager configManager = ConfigManager.getInstance();
+        if (configManager != null) {
+            configManager.setProtectionWorld(world);
+            configManager.setCenter(cx, cy, cz);
+        }
     }
 
     /**
-     * Sets the radius of the protected area.
+     * Sets the radius of the protected area and saves to config.
      *
      * @param r The new radius. Must be non-negative.
      */
     public void setRadius(double r) {
         this.radius = Math.max(0, r);
         this.radiusSq = radius * radius;
+
+        // Save to config
+        ConfigManager configManager = ConfigManager.getInstance();
+        if (configManager != null) {
+            configManager.setRadius(radius);
+        }
     }
 
     /**
