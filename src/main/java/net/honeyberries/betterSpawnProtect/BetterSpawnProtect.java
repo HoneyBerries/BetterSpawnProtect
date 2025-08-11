@@ -1,5 +1,6 @@
 package net.honeyberries.betterSpawnProtect;
 
+import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.honeyberries.betterSpawnProtect.command.CommandManager;
 import net.honeyberries.betterSpawnProtect.manager.ConfigManager;
@@ -7,6 +8,7 @@ import net.honeyberries.betterSpawnProtect.manager.MessageGate;
 import net.honeyberries.betterSpawnProtect.manager.PlayerLifecycleManager;
 import net.honeyberries.betterSpawnProtect.manager.ProtectionListener;
 import net.honeyberries.betterSpawnProtect.manager.ProtectionManager;
+import net.honeyberries.betterSpawnProtect.task.GamemodeTask;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -14,66 +16,53 @@ import java.util.List;
 
 /**
  * Main class for the BetterSpawnProtect plugin.
- * This class handles the plugin lifecycle and manages core components such as
- * the ProtectionManager, MessageGate, and command registration.
+ * Handles plugin lifecycle, core managers, listeners, and command registration.
  */
 public class BetterSpawnProtect extends JavaPlugin {
 
-    // Singleton instance of the plugin
     private static BetterSpawnProtect instance;
 
-    // Manages spawn protection logic
     private ProtectionManager protectionManager;
-
-    // Handles message cooldowns for players
     private MessageGate messageGate;
-
-    // Manages configuration
     private ConfigManager configManager;
+    private GamemodeTask gamemodeTask;
 
     /**
-     * Gets the singleton instance of the BetterSpawnProtect plugin.
-     *
-     * @return the instance of the plugin
+     * Gets the singleton instance of the plugin.
      */
     public static BetterSpawnProtect getInstance() {
         return instance;
     }
 
-    /**
-     * Called when the plugin is loaded. Initializes the singleton instance.
-     */
     @Override
     public void onLoad() {
         instance = this;
     }
 
-    /**
-     * Called when the plugin is enabled. Initializes core components, registers
-     * event listeners, and sets up commands.
-     */
     @Override
     public void onEnable() {
-        // Initialize the ConfigManager first
+        // Initialize config manager
         this.configManager = ConfigManager.getInstance(this);
 
-        // Initialize the ProtectionManager (now loads from config)
+        // Initialize protection manager
         this.protectionManager = new ProtectionManager();
 
-        // Initialize the MessageGate with a 2-second cooldown per player
-        this.messageGate = new MessageGate(2000L);
+        // Initialize message gate (2s cooldown)
+        this.messageGate = new MessageGate(8000L);
 
-        // Register event listeners for protection logic
+        // Register listeners
         Bukkit.getPluginManager().registerEvents(new ProtectionListener(protectionManager, messageGate), this);
         Bukkit.getPluginManager().registerEvents(new PlayerLifecycleManager(protectionManager), this);
 
-        // Register commands using the CommandManager with proper lifecycle handling
-        CommandManager commandManager = new CommandManager(this, protectionManager);
+        // Start repeating gamemode task
+        this.gamemodeTask = new GamemodeTask(this, protectionManager);
+        gamemodeTask.startTask();
 
-        // Use a more robust approach for command registration
+        // Register commands
+        CommandManager commandManager = new CommandManager(this, protectionManager);
         try {
             getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
-                final var commands = event.registrar();
+                Commands commands = event.registrar();
                 commands.register(
                     commandManager.getBuildCommand(),
                     "Main command for BetterSpawnProtect",
@@ -82,19 +71,17 @@ public class BetterSpawnProtect extends JavaPlugin {
             });
         } catch (Exception e) {
             getLogger().warning("Failed to register commands via lifecycle manager: " + e.getMessage());
-            getLogger().info("Commands may need to be registered manually or the server may not support Paper's command lifecycle.");
         }
 
-        // Log a message indicating the plugin has been enabled
         getLogger().info("BetterSpawnProtect enabled. " + protectionManager.getCenterSummary());
     }
 
-    /**
-     * Called when the plugin is disabled. Saves any pending configuration changes.
-     */
     @Override
     public void onDisable() {
-        // Ensure config is saved on disable
+        // Stop gamemode task
+        gamemodeTask.stopTask();
+
+        // Save config
         if (configManager != null) {
             configManager.saveConfig();
         }
@@ -102,8 +89,7 @@ public class BetterSpawnProtect extends JavaPlugin {
     }
 
     /**
-     * Reloads the plugin configuration and updates the ProtectionManager.
-     * Logs a message indicating the reload status.
+     * Reloads plugin configuration and updates protection manager.
      */
     public void reloadAll() {
         if (configManager != null) {
@@ -113,12 +99,4 @@ public class BetterSpawnProtect extends JavaPlugin {
         getLogger().info("BetterSpawnProtect reloaded. " + protectionManager.getCenterSummary());
     }
 
-    /**
-     * Gets the ConfigManager instance.
-     *
-     * @return The ConfigManager instance.
-     */
-    public ConfigManager getConfigManager() {
-        return configManager;
-    }
 }

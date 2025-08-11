@@ -4,4 +4,4 @@ protection:
     x: 0.5
     y: 64.0
     z: 0.5
-  radius: 32.0
+  radius: 64

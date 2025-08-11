@@ -2,6 +2,7 @@ package net.honeyberries.betterSpawnProtect.manager;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -59,12 +60,22 @@ public class ProtectionListener implements Listener {
      * @param e The cancellable event.
      */
     private void denyIfProtected(Player player, Location loc, Cancellable e) {
-        if (!protectionManager.isProtected(loc)) return;
-        if (player.hasPermission(bypassPerm)) return;
-        e.setCancelled(true);
-        if (messageGate.canSend(player.getUniqueId())) {
-            player.sendMessage(denyMessage);
+        if (player.getGameMode() == GameMode.CREATIVE || player.hasPermission(bypassPerm)) {
+            return;
         }
+
+        // Check if the player is in the protected area
+        if (protectionManager.isProtected(loc)) {
+            e.setCancelled(true);
+
+            // Send deny message if allowed by the message gate to prevent spam
+            if (messageGate.canSend(player.getUniqueId())) {
+                player.sendMessage(denyMessage);
+            }
+        }
+
+
+
     }
 
     /**
