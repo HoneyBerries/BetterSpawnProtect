@@ -1,13 +1,15 @@
 package net.honeyberries.betterSpawnProtect;
 
+import net.honeyberries.betterSpawnProtect.command.CommandManager;
+import net.honeyberries.betterSpawnProtect.manager.MessageGate;
+import net.honeyberries.betterSpawnProtect.manager.ProtectionListener;
+import net.honeyberries.betterSpawnProtect.manager.ProtectionManager;
 import org.bukkit.Bukkit;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class BetterSpawnProtect extends JavaPlugin {
 
     private static BetterSpawnProtect instance;
-    private ConfigManager configManager;
     private ProtectionManager protectionManager;
     private MessageGate messageGate;
 
@@ -22,42 +24,28 @@ public class BetterSpawnProtect extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Init config manager (creates config.yml if missing)
-        this.configManager = new ConfigManager(this);
-        this.configManager.load();
-
-        this.protectionManager = new ProtectionManager(configManager);
+        this.protectionManager = new ProtectionManager();
         this.messageGate = new MessageGate(2000L); // 2s cooldown per player
 
         // Register listeners
         Bukkit.getPluginManager().registerEvents(new ProtectionListener(protectionManager, messageGate), this);
 
         // Register command
-        BSPCommand command = new BSPCommand(protectionManager, configManager);
-        PluginCommand pc = getCommand("betterspawnprotect");
-        if (pc != null) {
-            pc.setExecutor(command);
-            pc.setTabCompleter(command);
-        } else {
-            getLogger().severe("Command 'betterspawnprotect' not defined in plugin.yml");
-        }
+        CommandManager commandManager = new CommandManager(this, protectionManager);
+        this.getLifecycleManager().registerEventHandler(io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents.COMMANDS, event -> {
+            event.registrar().register(commandManager.getRootCommand().build(), "BetterSpawnProtect command", java.util.List.of("bsp"));
+        });
 
         getLogger().info("BetterSpawnProtect enabled. Center: " + protectionManager.getCenterSummary());
     }
 
     @Override
     public void onDisable() {
-        // Persist config (if modified)
-        configManager.save();
+        // Nothing to do here anymore
     }
 
     public void reloadAll() {
-        configManager.load();
         protectionManager.reloadFromConfig();
         getLogger().info("BetterSpawnProtect reloaded. " + protectionManager.getCenterSummary());
-    }
-
-    public ConfigManager getConfigManager() {
-        return configManager;
     }
 }

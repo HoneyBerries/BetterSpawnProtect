@@ -1,13 +1,10 @@
-package net.honeyberries.betterSpawnProtect;
+package net.honeyberries.betterSpawnProtect.manager;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 public class ProtectionManager {
-
-    private final ConfigManager configManager;
 
     private World world;
     private double cx;
@@ -16,19 +13,19 @@ public class ProtectionManager {
     private double radius;
     private double radiusSq;
 
-    public ProtectionManager(ConfigManager configManager) {
-        this.configManager = configManager;
-        reloadFromConfig();
+    public ProtectionManager() {
+        // Default values
+        this.world = Bukkit.getWorlds().isEmpty() ? null : Bukkit.getWorlds().get(0);
+        this.cx = 0.5;
+        this.cy = 64.0;
+        this.cz = 0.5;
+        this.radius = 32.0;
+        this.radiusSq = radius * radius;
     }
 
     public void reloadFromConfig() {
-        YamlConfiguration c = configManager.getConfig();
-        this.world = Bukkit.getWorld(c.getString("spawn.world", "world"));
-        this.cx = c.getDouble("spawn.x", 0.5);
-        this.cy = c.getDouble("spawn.y", 64.0);
-        this.cz = c.getDouble("spawn.z", 0.5);
-        this.radius = Math.max(0, c.getDouble("spawn.radius", 32.0));
-        this.radiusSq = radius * radius;
+        // This method is now obsolete but is kept for compatibility with the reload command.
+        // In the future, this could load from a database or other persistent storage.
     }
 
     public boolean isProtected(Location loc) {
@@ -45,23 +42,19 @@ public class ProtectionManager {
         this.cx = newCenter.getX();
         this.cy = newCenter.getY();
         this.cz = newCenter.getZ();
-        configManager.setSpawn(world.getName(), cx, cy, cz);
-        recalc();
     }
 
     public void setRadius(double r) {
         this.radius = Math.max(0, r);
         this.radiusSq = radius * radius;
-        configManager.setRadius(this.radius);
-    }
-
-    private void recalc() {
-        this.radius = configManager.getConfig().getDouble("spawn.radius", radius);
-        this.radiusSq = radius * radius;
     }
 
     public String getCenterSummary() {
-        if (world == null) return "World not loaded yet.";
+        if (world == null) {
+            // Attempt to get the default world if it's still null
+            this.world = Bukkit.getWorlds().isEmpty() ? null : Bukkit.getWorlds().get(0);
+            if (world == null) return "World not loaded yet.";
+        }
         return String.format("Center: %s (%.2f, %.2f, %.2f) Radius: %.2f",
                 world.getName(), cx, cy, cz, radius);
     }

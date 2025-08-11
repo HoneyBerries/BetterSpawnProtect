@@ -6,12 +6,6 @@ authors: [ HoneyBerries ]
 description: Spawn Protection Fix for Minecraft
 website: honeyberries.net
 folia-supported: true
-commands:
-  betterspawnprotect:
-    description: Manage BetterSpawnProtect
-    usage: /betterspawnprotect <subcommand>
-    aliases: [ bsp ]
-    permission: betterspawnprotect.admin
 permissions:
   betterspawnprotect.admin:
     description: Allows using BetterSpawnProtect admin commands
