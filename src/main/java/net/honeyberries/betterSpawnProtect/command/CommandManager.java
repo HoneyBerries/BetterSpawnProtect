@@ -2,9 +2,9 @@ package net.honeyberries.betterSpawnProtect.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolver;
@@ -17,17 +17,36 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import io.papermc.paper.math.BlockPosition;
 
+/**
+ * Manages the registration and execution of commands for the BetterSpawnProtect plugin.
+ * Provides commands for viewing protection info, setting the center and radius of the
+ * protected area, and reloading the plugin configuration.
+ */
 public class CommandManager {
 
+    // Reference to the main plugin instance
     private final BetterSpawnProtect plugin;
+
+    // Reference to the ProtectionManager for managing protection logic
     private final ProtectionManager protectionManager;
 
+    /**
+     * Constructs a CommandManager with the given plugin and ProtectionManager.
+     *
+     * @param plugin The main plugin instance.
+     * @param protectionManager The ProtectionManager instance.
+     */
     public CommandManager(BetterSpawnProtect plugin, ProtectionManager protectionManager) {
         this.plugin = plugin;
         this.protectionManager = protectionManager;
     }
 
-    public LiteralArgumentBuilder<CommandSourceStack> getRootCommand() {
+    /**
+     * Builds and returns the root command node for the BetterSpawnProtect commands.
+     *
+     * @return The root command node.
+     */
+    public LiteralCommandNode<CommandSourceStack> getBuildCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("betterspawnprotect")
                 .requires(source -> source.getSender().hasPermission("betterspawnprotect.admin"))
                 .then(info())
@@ -37,9 +56,14 @@ public class CommandManager {
                 .executes(ctx -> {
                     sendHelp(ctx.getSource().getSender());
                     return Command.SINGLE_SUCCESS;
-                });
+                }).build();
     }
 
+    /**
+     * Creates the "info" subcommand, which displays the current protection info.
+     *
+     * @return The "info" command builder.
+     */
     private LiteralArgumentBuilder<CommandSourceStack> info() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("info")
                 .executes(ctx -> {
@@ -51,6 +75,12 @@ public class CommandManager {
                 });
     }
 
+    /**
+     * Creates the "setcenter" subcommand, which sets the center of the protected area.
+     * Allows setting the center to the player's current location or specified coordinates.
+     *
+     * @return The "setcenter" command builder.
+     */
     private LiteralArgumentBuilder<CommandSourceStack> setCenter() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("setcenter")
                 .executes(ctx -> {
@@ -79,6 +109,11 @@ public class CommandManager {
                         }));
     }
 
+    /**
+     * Creates the "setradius" subcommand, which sets the radius of the protected area.
+     *
+     * @return The "setradius" command builder.
+     */
     private LiteralArgumentBuilder<CommandSourceStack> setRadius() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("setradius")
                 .then(RequiredArgumentBuilder.<CommandSourceStack, Double>argument("radius", DoubleArgumentType.doubleArg(0))
@@ -92,6 +127,11 @@ public class CommandManager {
                         }));
     }
 
+    /**
+     * Creates the "reload" subcommand, which reloads the plugin configuration.
+     *
+     * @return The "reload" command builder.
+     */
     private LiteralArgumentBuilder<CommandSourceStack> reload() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("reload")
                 .executes(ctx -> {
@@ -101,6 +141,11 @@ public class CommandManager {
                 });
     }
 
+    /**
+     * Sends a help message to the command sender, listing all available commands.
+     *
+     * @param sender The command sender.
+     */
     private void sendHelp(CommandSender sender) {
         sender.sendMessage(Component.text("--- BetterSpawnProtect Commands ---", NamedTextColor.YELLOW));
         sender.sendMessage(Component.text("/bsp info", NamedTextColor.YELLOW)
