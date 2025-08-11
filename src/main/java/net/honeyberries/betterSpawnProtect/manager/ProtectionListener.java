@@ -11,6 +11,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
@@ -236,6 +237,38 @@ public class ProtectionListener implements Listener {
         if (protectionManager.isProtected(e.getLocation())) {
             if (e.getPlayer() != null && e.getPlayer().hasPermission(bypassPerm)) return;
             e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void onBlockForm(BlockFormEvent e) {
+        if (protectionManager.isProtected(e.getBlock().getLocation())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void onBlockFade(BlockFadeEvent e) {
+        if (protectionManager.isProtected(e.getBlock().getLocation())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
+        if (e.getEntity() instanceof Player) {
+            return; // Player damage is handled by PlayerLifecycleManager
+        }
+        if (protectionManager.isProtected(e.getEntity().getLocation())) {
+            if (e.getDamager() instanceof Player p) {
+                if (p.hasPermission(bypassPerm)) return;
+                e.setCancelled(true);
+                if (messageGate.canSend(p.getUniqueId())) {
+                    p.sendMessage(denyMessage);
+                }
+            } else {
+                e.setCancelled(true);
+            }
         }
     }
 }

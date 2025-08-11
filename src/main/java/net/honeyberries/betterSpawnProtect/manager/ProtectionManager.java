@@ -54,8 +54,11 @@ public class ProtectionManager {
      * @return true if the location is protected, false otherwise.
      */
     public boolean isProtected(Location loc) {
-        if (world == null || loc.getWorld() == null) return false;
-        if (!loc.getWorld().equals(world)) return false;
+        if (world == null) {
+            this.world = Bukkit.getWorlds().isEmpty() ? null : Bukkit.getWorlds().getFirst();
+            if (world == null) return false;
+        }
+        if (loc.getWorld() == null || !loc.getWorld().equals(world)) return false;
         double dx = loc.getX() - cx;
         double dz = loc.getZ() - cz;
         return (dx * dx + dz * dz) <= radiusSq;

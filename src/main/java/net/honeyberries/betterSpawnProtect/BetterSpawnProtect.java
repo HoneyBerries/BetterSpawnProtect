@@ -3,6 +3,7 @@ package net.honeyberries.betterSpawnProtect;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.honeyberries.betterSpawnProtect.command.CommandManager;
 import net.honeyberries.betterSpawnProtect.manager.MessageGate;
+import net.honeyberries.betterSpawnProtect.manager.PlayerLifecycleManager;
 import net.honeyberries.betterSpawnProtect.manager.ProtectionListener;
 import net.honeyberries.betterSpawnProtect.manager.ProtectionManager;
 import org.bukkit.Bukkit;
@@ -57,6 +58,7 @@ public class BetterSpawnProtect extends JavaPlugin {
 
         // Register event listeners for protection logic
         Bukkit.getPluginManager().registerEvents(new ProtectionListener(protectionManager, messageGate), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerLifecycleManager(protectionManager), this);
 
         // Register commands using the CommandManager
         CommandManager commandManager = new CommandManager(this, protectionManager);
