@@ -1,4 +1,4 @@
-package net.honeyberries.betterSpawnProtect;
+package net.honeyberries.betterSpawnProtect.manager;
 
 import java.util.HashMap;
 import java.util.Map;

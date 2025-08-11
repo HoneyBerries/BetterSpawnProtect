@@ -1,15 +1,22 @@
-package net.honeyberries.betterSpawnProtect;
+package net.honeyberries.betterSpawnProtect.manager;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.event.*;
+import org.bukkit.event.Cancellable;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 
 import java.util.Iterator;
@@ -19,6 +26,7 @@ public class ProtectionListener implements Listener {
     private final ProtectionManager protectionManager;
     private final MessageGate messageGate;
     private final String bypassPerm = "betterspawnprotect.bypass";
+    private final Component denyMessage = Component.text("You cannot modify blocks in the protected spawn.", NamedTextColor.RED);
 
     public ProtectionListener(ProtectionManager protectionManager, MessageGate messageGate) {
         this.protectionManager = protectionManager;
@@ -30,7 +38,7 @@ public class ProtectionListener implements Listener {
         if (player.hasPermission(bypassPerm)) return;
         e.setCancelled(true);
         if (messageGate.canSend(player.getUniqueId())) {
-            player.sendMessage(ChatUtil.color(ConfigManager.getInstance().getDenyMessage()));
+            player.sendMessage(denyMessage);
         }
     }
 
@@ -49,7 +57,7 @@ public class ProtectionListener implements Listener {
     // Interaction that might change blocks (e.g. trampling farmland / turtle eggs)
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onPhysical(PlayerInteractEvent e) {
-        if (e.getAction() == Action.PHYSICAL && e.getClickedBlock() != null) {
+        if (e.getAction() == org.bukkit.event.block.Action.PHYSICAL && e.getClickedBlock() != null) {
             denyIfProtected(e.getPlayer(), e.getClickedBlock().getLocation(), e);
         }
     }
@@ -80,7 +88,7 @@ public class ProtectionListener implements Listener {
                 if (p.hasPermission(bypassPerm)) return;
                 e.setCancelled(true);
                 if (messageGate.canSend(p.getUniqueId())) {
-                    p.sendMessage(ChatUtil.color(ConfigManager.getInstance().getDenyMessage()));
+                    p.sendMessage(denyMessage);
                 }
             } else {
                 // Entity-caused (arrow, creeper etc.)
