@@ -4,52 +4,37 @@ import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.honeyberries.betterSpawnProtect.command.CommandManager;
 import net.honeyberries.betterSpawnProtect.configuration.ConfigManager;
-import net.honeyberries.betterSpawnProtect.util.MessageGate;
 import net.honeyberries.betterSpawnProtect.listener.ProtectionListener;
 import net.honeyberries.betterSpawnProtect.manager.ProtectionManager;
 import net.honeyberries.betterSpawnProtect.task.GamemodeTask;
+import net.honeyberries.betterSpawnProtect.util.MessageGate;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Main class for the BetterSpawnProtect plugin.
- * Handles plugin lifecycle, core managers, listeners, and command registration.
+ * Handles plugin initialization, lifecycle, and core components.
  */
 public class BetterSpawnProtect extends JavaPlugin {
 
-    private static BetterSpawnProtect instance;
-
     private ProtectionManager protectionManager;
-    private MessageGate messageGate;
-    private ConfigManager configManager;
     private GamemodeTask gamemodeTask;
-
-    /**
-     * Gets the singleton instance of the plugin.
-     */
-    public static BetterSpawnProtect getInstance() {
-        return instance;
-    }
-
-    @Override
-    public void onLoad() {
-        instance = this;
-    }
 
     @Override
     public void onEnable() {
-        // Initialize config manager
-        this.configManager = ConfigManager.getInstance(this);
+        // Initialize configuration manager
+        ConfigManager configManager = ConfigManager.getInstance(this);
 
         // Initialize protection manager
-        this.protectionManager = new ProtectionManager();
+        this.protectionManager = new ProtectionManager(this);
 
-        // Initialize message gate (2s cooldown)
-        this.messageGate = new MessageGate(8000L);
+        // Initialize message gate (4s cooldown)
+        MessageGate messageGate = new MessageGate(4000L);
 
-        // Register listeners
+        // Register event listeners
         Bukkit.getPluginManager().registerEvents(new ProtectionListener(protectionManager, messageGate), this);
 
         // Start repeating gamemode task
@@ -57,44 +42,51 @@ public class BetterSpawnProtect extends JavaPlugin {
         gamemodeTask.startTask();
 
         // Register commands
-        CommandManager commandManager = new CommandManager(this, protectionManager);
-        try {
-            getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
-                Commands commands = event.registrar();
-                commands.register(
-                    commandManager.getBuildCommand(),
-                    "Main command for BetterSpawnProtect",
-                    List.of("bsp")
-                );
-            });
-        } catch (Exception e) {
-            getLogger().warning("Failed to register commands via lifecycle manager: " + e.getMessage());
-        }
+        registerCommands();
 
-        getLogger().info("BetterSpawnProtect enabled. " + protectionManager.getCenterSummary());
+        getLogger().info("BetterSpawnProtect has been enabled. " + protectionManager.getCenterSummary());
     }
 
     @Override
     public void onDisable() {
         // Stop gamemode task
-        gamemodeTask.stopTask();
+        if (gamemodeTask != null) {
+            gamemodeTask.stopTask();
+        }
 
-        // Save config
+        // Save configuration
+        ConfigManager configManager = ConfigManager.getInstance();
         if (configManager != null) {
             configManager.saveConfig();
         }
-        getLogger().info("BetterSpawnProtect disabled.");
+        getLogger().info("BetterSpawnProtect has been disabled.");
     }
 
     /**
-     * Reloads plugin configuration and updates protection manager.
+     * Registers the plugin's commands.
      */
-    public void reloadAll() {
-        if (configManager != null) {
-            configManager.reloadConfig();
+    private void registerCommands() {
+        CommandManager commandManager = new CommandManager(this, protectionManager);
+        try {
+            getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
+                Commands commands = event.registrar();
+                commands.register(
+                        commandManager.getBuildCommand(),
+                        "Main command for BetterSpawnProtect",
+                        List.of("bsp")
+                );
+            });
+        } catch (Exception e) {
+            getLogger().log(Level.SEVERE, "Failed to register commands", e);
         }
-        protectionManager.reloadFromConfig();
-        getLogger().info("BetterSpawnProtect reloaded. " + protectionManager.getCenterSummary());
     }
 
+    /**
+     * Reloads the plugin's configuration and updates the protection manager.
+     */
+    public void reloadAll() {
+        ConfigManager.getInstance().reloadConfig();
+        protectionManager.reloadFromConfig();
+        getLogger().info("BetterSpawnProtect configuration reloaded. " + protectionManager.getCenterSummary());
+    }
 }
