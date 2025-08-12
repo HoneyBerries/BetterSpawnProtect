@@ -7,25 +7,21 @@ import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
 
 /**
- * Manages the plugin configuration using YAML.
- * Handles loading and saving of spawn protection settings.
+ * Manages the plugin's configuration file (config.yml).
+ * Handles loading, saving, and providing access to configuration values.
  */
 public class ConfigManager {
 
-    // Singleton instance
     private static ConfigManager instance;
-
-    // Reference to the plugin
     private final Plugin plugin;
-
-    // Configuration file and YAML configuration
     private final File configFile;
     private YamlConfiguration config;
 
     /**
-     * Private constructor for singleton pattern.
+     * Private constructor to enforce the singleton pattern.
      *
      * @param plugin The plugin instance.
      */
@@ -36,10 +32,10 @@ public class ConfigManager {
     }
 
     /**
-     * Gets the singleton instance of ConfigManager.
+     * Gets the singleton instance of the ConfigManager.
      *
      * @param plugin The plugin instance.
-     * @return The ConfigManager instance.
+     * @return The singleton ConfigManager instance.
      */
     public static ConfigManager getInstance(Plugin plugin) {
         if (instance == null) {
@@ -49,16 +45,16 @@ public class ConfigManager {
     }
 
     /**
-     * Gets the singleton instance (only if already initialized).
+     * Gets the singleton instance, assuming it has been initialized.
      *
-     * @return The ConfigManager instance or null if not initialized.
+     * @return The ConfigManager instance, or null if not yet initialized.
      */
     public static ConfigManager getInstance() {
         return instance;
     }
 
     /**
-     * Loads the configuration from file or creates default values.
+     * Loads the configuration from the file, creating a default if it doesn't exist.
      */
     private void loadConfig() {
         if (!configFile.exists()) {
@@ -69,60 +65,63 @@ public class ConfigManager {
     }
 
     /**
-     * Creates a default configuration file with default values.
+     * Creates a default configuration file with predefined values and comments.
      */
     private void createDefaultConfig() {
         config = new YamlConfiguration();
+        config.options().header("BetterSpawnProtect Configuration");
 
-        // Set default values
         config.set("protection.world", "world");
         config.set("protection.center.x", 0.5);
         config.set("protection.center.y", 64.0);
         config.set("protection.center.z", 0.5);
         config.set("protection.radius", 32.0);
 
+        config.setComments("protection.world", "The world where spawn protection is active.");
+        config.setComments("protection.center", "The center coordinates of the protected area.");
+        config.setComments("protection.radius", "The radius of the protected area in blocks.");
+
         saveConfig();
     }
 
     /**
-     * Saves the current configuration to file.
+     * Saves the current configuration to the config.yml file.
      */
     public void saveConfig() {
         try {
             config.save(configFile);
         } catch (IOException e) {
-            plugin.getLogger().severe("Could not save config.yml: " + e.getMessage());
+            plugin.getLogger().log(Level.SEVERE, "Could not save config.yml", e);
         }
     }
 
     /**
-     * Reloads the configuration from file.
+     * Reloads the configuration from the config.yml file.
      */
     public void reloadConfig() {
         config = YamlConfiguration.loadConfiguration(configFile);
     }
 
     /**
-     * Gets the protection world name from config.
+     * Gets the name of the protected world from the configuration.
      *
-     * @return The world name.
+     * @return The name of the world.
      */
     public String getProtectionWorldName() {
         return config.getString("protection.world", "world");
     }
 
     /**
-     * Gets the protection world.
+     * Gets the protected world from the server.
      *
-     * @return The world object or null if not found.
+     * @return The World object, or null if not found.
      */
     public World getProtectionWorld() {
-        String worldName = getProtectionWorldName();
-        return Bukkit.getWorld(worldName);
+        return Bukkit.getWorld(getProtectionWorldName());
     }
 
     /**
-     * Gets the protection center X coordinate.
+     * Gets the X coordinate of the protection center.
      *
      * @return The X coordinate.
      */
@@ -131,7 +130,7 @@ public class ConfigManager {
     }
 
     /**
-     * Gets the protection center Y coordinate.
+     * Gets the Y coordinate of the protection center.
      *
      * @return The Y coordinate.
      */
@@ -140,7 +139,7 @@ public class ConfigManager {
     }
 
     /**
-     * Gets the protection center Z coordinate.
+     * Gets the Z coordinate of the protection center.
      *
      * @return The Z coordinate.
      */
@@ -149,7 +148,7 @@ public class ConfigManager {
     }
 
     /**
-     * Gets the protection radius.
+     * Gets the radius of the protected area.
      *
      * @return The radius.
      */
@@ -158,9 +157,9 @@ public class ConfigManager {
     }
 
     /**
-     * Sets the protection world.
+     * Sets the protected world in the configuration.
      *
-     * @param world The world to set.
+     * @param world The world to set as protected.
      */
     public void setProtectionWorld(World world) {
         config.set("protection.world", world.getName());
@@ -168,7 +167,7 @@ public class ConfigManager {
     }
 
     /**
-     * Sets the protection center coordinates.
+     * Sets the center of the protected area in the configuration.
      *
      * @param x The X coordinate.
      * @param y The Y coordinate.
@@ -182,7 +181,7 @@ public class ConfigManager {
     }
 
     /**
-     * Sets the protection radius.
+     * Sets the radius of the protected area in the configuration.
      *
      * @param radius The radius to set.
      */
