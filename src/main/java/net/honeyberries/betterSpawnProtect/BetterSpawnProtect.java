@@ -3,10 +3,9 @@ package net.honeyberries.betterSpawnProtect;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.honeyberries.betterSpawnProtect.command.CommandManager;
-import net.honeyberries.betterSpawnProtect.manager.ConfigManager;
-import net.honeyberries.betterSpawnProtect.manager.MessageGate;
-import net.honeyberries.betterSpawnProtect.manager.PlayerLifecycleManager;
-import net.honeyberries.betterSpawnProtect.manager.ProtectionListener;
+import net.honeyberries.betterSpawnProtect.configuration.ConfigManager;
+import net.honeyberries.betterSpawnProtect.util.MessageGate;
+import net.honeyberries.betterSpawnProtect.listener.ProtectionListener;
 import net.honeyberries.betterSpawnProtect.manager.ProtectionManager;
 import net.honeyberries.betterSpawnProtect.task.GamemodeTask;
 import org.bukkit.Bukkit;
@@ -52,7 +51,6 @@ public class BetterSpawnProtect extends JavaPlugin {
 
         // Register listeners
         Bukkit.getPluginManager().registerEvents(new ProtectionListener(protectionManager, messageGate), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerLifecycleManager(protectionManager), this);
 
         // Start repeating gamemode task
         this.gamemodeTask = new GamemodeTask(this, protectionManager);

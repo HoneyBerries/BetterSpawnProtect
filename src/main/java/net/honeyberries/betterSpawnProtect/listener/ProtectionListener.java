@@ -1,5 +1,7 @@
-package net.honeyberries.betterSpawnProtect.manager;
+package net.honeyberries.betterSpawnProtect.listener;
 
+import net.honeyberries.betterSpawnProtect.util.MessageGate;
+import net.honeyberries.betterSpawnProtect.manager.ProtectionManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
@@ -53,11 +55,12 @@ public class ProtectionListener implements Listener {
     }
 
     /**
-     * Denies an action if the location is within the protected area and the player lacks bypass permission.
+     * Denies block modification if the player is in a protected area.
+     * Checks if the player is in creative mode or has permission to bypass protection.
      *
      * @param player The player attempting the action.
-     * @param loc The location of the action.
-     * @param e The cancellable event.
+     * @param loc The location of the block being modified.
+     * @param e The cancellable event to be cancelled if the block is protected.
      */
     private void denyIfProtected(Player player, Location loc, Cancellable e) {
         if (player.getGameMode() == GameMode.CREATIVE || player.hasPermission(bypassPerm)) {
@@ -128,6 +131,31 @@ public class ProtectionListener implements Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onBucketFill(PlayerBucketFillEvent e) {
         denyIfProtected(e.getPlayer(), e.getBlockClicked().getLocation(), e);
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void onPistonExtend(BlockPistonExtendEvent e) {
+        for (Block block : e.getBlocks()) {
+            if (protectionManager.isProtected(block.getLocation())) {
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void onPistonRetract(BlockPistonRetractEvent e) {
+        for (Block block : e.getBlocks()) {
+            if (protectionManager.isProtected(block.getLocation())) {
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void onBlockInteract(PlayerInteractEvent e) {
+        if (e.getClickedBlock() != null) {
+            denyIfProtected(e.getPlayer(), e.getClickedBlock().getLocation(), e);
+        }
     }
 
     /**
@@ -267,8 +295,8 @@ public class ProtectionListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
-        if (e.getEntity() instanceof Player) {
-            return; // Player damage is handled by PlayerLifecycleManager
+        if (e.getEntity() instanceof Player && e.getDamager() instanceof Player) {
+            return;
         }
         if (protectionManager.isProtected(e.getEntity().getLocation())) {
             if (e.getDamager() instanceof Player p) {

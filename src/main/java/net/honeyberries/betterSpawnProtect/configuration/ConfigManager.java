@@ -1,4 +1,4 @@
-package net.honeyberries.betterSpawnProtect.manager;
+package net.honeyberries.betterSpawnProtect.configuration;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
