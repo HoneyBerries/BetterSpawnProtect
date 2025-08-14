@@ -22,7 +22,7 @@ import io.papermc.paper.math.BlockPosition;
  * Provides commands for viewing protection info, setting the center and radius of the
  * protected area, and reloading the plugin configuration.
  */
-public class CommandManager {
+public class BetterSpawnProtectCommand {
 
     // Reference to the main plugin instance
     private final BetterSpawnProtect plugin;
@@ -31,12 +31,12 @@ public class CommandManager {
     private final ProtectionManager protectionManager;
 
     /**
-     * Constructs a CommandManager with the given plugin and ProtectionManager.
+     * Constructs a BetterSpawnProtectCommand with the given plugin and ProtectionManager.
      *
      * @param plugin The main plugin instance.
      * @param protectionManager The ProtectionManager instance.
      */
-    public CommandManager(BetterSpawnProtect plugin, ProtectionManager protectionManager) {
+    public BetterSpawnProtectCommand(BetterSpawnProtect plugin, ProtectionManager protectionManager) {
         this.plugin = plugin;
         this.protectionManager = protectionManager;
     }
@@ -93,7 +93,7 @@ public class CommandManager {
                         return Command.SINGLE_SUCCESS;
                     } else {
                         ctx.getSource().getSender().sendMessage(Component.text("Console must specify coordinates.", NamedTextColor.RED));
-                        return 0;
+                        return Command.SINGLE_SUCCESS;
                     }
                 })
                 .then(RequiredArgumentBuilder.<CommandSourceStack, BlockPositionResolver>argument("position", ArgumentTypes.blockPosition())
