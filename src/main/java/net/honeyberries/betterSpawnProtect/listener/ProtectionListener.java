@@ -22,8 +22,6 @@ import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.world.StructureGrowEvent;
 
-import java.util.Iterator;
-
 /**
  * Listener for handling events related to spawn protection.
  * This class prevents unauthorized modifications to the protected spawn area.
