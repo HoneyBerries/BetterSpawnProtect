@@ -1,7 +1,13 @@
-protection:
-  world: world
-  center:
-    x: 0.5
-    y: 64.0
-    z: 0.5
-  radius: 64
+# Protection configuration section
+  protection:
+    # Name of the world where protection applies
+    world: world
+    center:
+      # X coordinate of the protection center (decimal for precision)
+      x: 0.5
+      # Y coordinate (height) of the protection center
+      y: 64.0
+      # Z coordinate of the protection center (decimal for precision)
+      z: 0.5
+    # Protection radius in blocks
+    radius: 64

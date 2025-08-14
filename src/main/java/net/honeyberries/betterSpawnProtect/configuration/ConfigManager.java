@@ -7,6 +7,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.logging.Level;
 
 /**
@@ -77,9 +78,9 @@ public class ConfigManager {
         config.set("protection.center.z", 0.5);
         config.set("protection.radius", 32.0);
 
-        config.setComments("protection.world", "The world where spawn protection is active.");
-        config.setComments("protection.center", "The center coordinates of the protected area.");
-        config.setComments("protection.radius", "The radius of the protected area in blocks.");
+        config.setComments("protection.world", Collections.singletonList("The world where spawn protection is active."));
+        config.setComments("protection.center", Collections.singletonList("The center coordinates of the protected area."));
+        config.setComments("protection.radius", Collections.singletonList("The radius of the protected area in blocks."));
 
         saveConfig();
     }

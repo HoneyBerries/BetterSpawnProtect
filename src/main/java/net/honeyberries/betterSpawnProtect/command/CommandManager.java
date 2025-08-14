@@ -147,14 +147,15 @@ public class CommandManager {
      * @param sender The command sender.
      */
     private void sendHelp(CommandSender sender) {
-        sender.sendMessage(Component.text("--- BetterSpawnProtect Commands ---", NamedTextColor.YELLOW));
-        sender.sendMessage(Component.text("/bsp info", NamedTextColor.YELLOW)
-                .append(Component.text(" - Show protection info", NamedTextColor.GRAY)));
-        sender.sendMessage(Component.text("/bsp setcenter [x y z]", NamedTextColor.YELLOW)
-                .append(Component.text(" - Set center (coords or your location)", NamedTextColor.GRAY)));
-        sender.sendMessage(Component.text("/bsp setradius <r>", NamedTextColor.YELLOW)
-                .append(Component.text(" - Set radius", NamedTextColor.GRAY)));
-        sender.sendMessage(Component.text("/bsp reload", NamedTextColor.YELLOW)
-                .append(Component.text(" - Reload config", NamedTextColor.GRAY)));
+        sender.sendMessage(Component.text("------------ BetterSpawnProtect Commands ------------", NamedTextColor.GOLD));
+        sender.sendMessage(Component.text("/bsp info", NamedTextColor.GREEN)
+                .append(Component.text(" - Show protection info", NamedTextColor.AQUA)));
+        sender.sendMessage(Component.text("/bsp setcenter [x y z]", NamedTextColor.GREEN)
+                .append(Component.text(" - Set center (coords or your location)", NamedTextColor.AQUA)));
+        sender.sendMessage(Component.text("/bsp setradius <r>", NamedTextColor.GREEN)
+                .append(Component.text(" - Set radius", NamedTextColor.AQUA)));
+        sender.sendMessage(Component.text("/bsp reload", NamedTextColor.GREEN)
+                .append(Component.text(" - Reload config", NamedTextColor.AQUA)));
+        sender.sendMessage(Component.text("----------------------------------------------------", NamedTextColor.GOLD));
     }
 }

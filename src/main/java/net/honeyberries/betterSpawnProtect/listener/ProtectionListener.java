@@ -53,7 +53,7 @@ public class ProtectionListener implements Listener {
      * @return {@code true} if the player can bypass, {@code false} otherwise.
      */
     private boolean canBypass(Player player) {
-        return player.getGameMode() == GameMode.CREATIVE || player.hasPermission(bypassPerm);
+        return player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR || player.hasPermission(bypassPerm);
     }
 
     /**
@@ -76,26 +76,51 @@ public class ProtectionListener implements Listener {
         }
     }
 
+    /**
+     * Handles block break events and cancels them if the block is in the protected area.
+     *
+     * @param e The BlockBreakEvent.
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent e) {
         handlePlayerAction(e.getPlayer(), e.getBlock().getLocation(), e);
     }
 
+    /**
+     * Handles block place events and cancels them if the block is in the protected area.
+     *
+     * @param e The BlockPlaceEvent.
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onBlockPlace(BlockPlaceEvent e) {
         handlePlayerAction(e.getPlayer(), e.getBlockPlaced().getLocation(), e);
     }
 
+    /**
+     * Handles bucket empty events and cancels them if the location is in the protected area.
+     *
+     * @param e The PlayerBucketEmptyEvent.
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onBucketEmpty(PlayerBucketEmptyEvent e) {
         handlePlayerAction(e.getPlayer(), e.getBlockClicked().getLocation(), e);
     }
 
+    /**
+     * Handles bucket fill events and cancels them if the location is in the protected area.
+     *
+     * @param e The PlayerBucketFillEvent.
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onBucketFill(PlayerBucketFillEvent e) {
         handlePlayerAction(e.getPlayer(), e.getBlockClicked().getLocation(), e);
     }
 
+    /**
+     * Handles player interaction events and cancels them if the clicked block is in the protected area.
+     *
+     * @param e The PlayerInteractEvent.
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onPlayerInteract(PlayerInteractEvent e) {
         if (e.getClickedBlock() != null) {
@@ -103,11 +128,21 @@ public class ProtectionListener implements Listener {
         }
     }
 
+    /**
+     * Handles armor stand manipulation events and cancels them if the location is in the protected area.
+     *
+     * @param e The PlayerArmorStandManipulateEvent.
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onArmorStandManipulate(PlayerArmorStandManipulateEvent e) {
         handlePlayerAction(e.getPlayer(), e.getRightClicked().getLocation(), e);
     }
 
+    /**
+     * Handles piston extension events and cancels them if any affected block is in the protected area.
+     *
+     * @param e The BlockPistonExtendEvent.
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onPistonExtend(BlockPistonExtendEvent e) {
         for (Block block : e.getBlocks()) {
@@ -118,6 +153,11 @@ public class ProtectionListener implements Listener {
         }
     }
 
+    /**
+     * Handles piston retraction events and cancels them if any affected block is in the protected area.
+     *
+     * @param e The BlockPistonRetractEvent.
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onPistonRetract(BlockPistonRetractEvent e) {
         for (Block block : e.getBlocks()) {
@@ -128,6 +168,11 @@ public class ProtectionListener implements Listener {
         }
     }
 
+    /**
+     * Handles hanging entity break events and cancels them if the location is in the protected area.
+     *
+     * @param e The HangingBreakEvent.
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onHangingBreak(HangingBreakEvent e) {
         Location loc = e.getEntity().getLocation();
@@ -146,6 +191,11 @@ public class ProtectionListener implements Listener {
         }
     }
 
+    /**
+     * Handles entity block change events and cancels them if the block is in the protected area.
+     *
+     * @param e The EntityChangeBlockEvent.
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onEntityChangeBlock(EntityChangeBlockEvent e) {
         if (protectionManager.isProtected(e.getBlock().getLocation())) {
@@ -153,16 +203,31 @@ public class ProtectionListener implements Listener {
         }
     }
 
+    /**
+     * Handles entity explosion events and removes protected blocks from the affected list.
+     *
+     * @param e The EntityExplodeEvent.
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onEntityExplode(EntityExplodeEvent e) {
         e.blockList().removeIf(block -> protectionManager.isProtected(block.getLocation()));
     }
 
+    /**
+     * Handles block explosion events and removes protected blocks from the affected list.
+     *
+     * @param e The BlockExplodeEvent.
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onBlockExplode(BlockExplodeEvent e) {
         e.blockList().removeIf(block -> protectionManager.isProtected(block.getLocation()));
     }
 
+    /**
+     * Handles block ignite events and cancels them if the block is in the protected area.
+     *
+     * @param e The BlockIgniteEvent.
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onIgnite(BlockIgniteEvent e) {
         if (e.getPlayer() != null) {
@@ -172,6 +237,11 @@ public class ProtectionListener implements Listener {
         }
     }
 
+    /**
+     * Handles block burn events and cancels them if the block is in the protected area.
+     *
+     * @param e The BlockBurnEvent.
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onBurn(BlockBurnEvent e) {
         if (protectionManager.isProtected(e.getBlock().getLocation())) {
@@ -179,6 +249,11 @@ public class ProtectionListener implements Listener {
         }
     }
 
+    /**
+     * Handles block spread events and cancels them if the block is in the protected area.
+     *
+     * @param e The BlockSpreadEvent.
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onSpread(BlockSpreadEvent e) {
         if (protectionManager.isProtected(e.getBlock().getLocation())) {
@@ -186,6 +261,11 @@ public class ProtectionListener implements Listener {
         }
     }
 
+    /**
+     * Handles structure growth events and cancels them if the location is in the protected area.
+     *
+     * @param e The StructureGrowEvent.
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onStructureGrow(StructureGrowEvent e) {
         if (e.getPlayer() != null) {
@@ -195,6 +275,11 @@ public class ProtectionListener implements Listener {
         }
     }
 
+    /**
+     * Handles block form events and cancels them if the block is in the protected area.
+     *
+     * @param e The BlockFormEvent.
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onBlockForm(BlockFormEvent e) {
         if (protectionManager.isProtected(e.getBlock().getLocation())) {
@@ -202,6 +287,11 @@ public class ProtectionListener implements Listener {
         }
     }
 
+    /**
+     * Handles block fade events and cancels them if the block is in the protected area.
+     *
+     * @param e The BlockFadeEvent.
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onBlockFade(BlockFadeEvent e) {
         if (protectionManager.isProtected(e.getBlock().getLocation())) {
@@ -209,6 +299,11 @@ public class ProtectionListener implements Listener {
         }
     }
 
+    /**
+     * Handles block from-to events (e.g., liquid flow) and cancels them if the destination is in the protected area.
+     *
+     * @param e The BlockFromToEvent.
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onBlockFromTo(BlockFromToEvent e) {
         if (protectionManager.isProtected(e.getToBlock().getLocation())) {
@@ -216,6 +311,11 @@ public class ProtectionListener implements Listener {
         }
     }
 
+    /**
+     * Handles block fertilize events and cancels them if the block is in the protected area.
+     *
+     * @param e The BlockFertilizeEvent.
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onBlockFertilize(BlockFertilizeEvent e) {
         if (e.getPlayer() != null) {
@@ -225,6 +325,11 @@ public class ProtectionListener implements Listener {
         }
     }
 
+    /**
+     * Handles entity damage by entity events and cancels them if the action occurs in the protected area.
+     *
+     * @param e The EntityDamageByEntityEvent.
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
         Entity damager = e.getDamager();
@@ -245,7 +350,7 @@ public class ProtectionListener implements Listener {
                 }
             }
             // Prevent non-player entities from attacking players
-            else if (victim instanceof Player && !(damager instanceof Player)) {
+            else if (victim instanceof Player) {
                 e.setCancelled(true);
             }
         }

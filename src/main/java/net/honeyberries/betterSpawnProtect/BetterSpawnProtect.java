@@ -35,7 +35,7 @@ public class BetterSpawnProtect extends JavaPlugin {
         MessageGate messageGate = new MessageGate(4000L);
 
         // Register event listeners
-        Bukkit.getPluginManager().registerEvents(new ProtectionListener(protectionManager, messageGate), this);
+        getServer().getPluginManager().registerEvents(new ProtectionListener(protectionManager, messageGate), this);
 
         // Start repeating gamemode task
         this.gamemodeTask = new GamemodeTask(this, protectionManager);
