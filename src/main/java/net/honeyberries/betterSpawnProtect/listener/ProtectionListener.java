@@ -333,23 +333,12 @@ public class ProtectionListener implements Listener {
         Entity damager = e.getDamager();
         Entity victim = e.getEntity();
 
-        // Allow PvP
-        if (victim instanceof Player && damager instanceof Player) {
-            return;
-        }
-
         // If the action is in a protected area
         if (protectionManager.isProtected(victim.getLocation())) {
             // Prevent players from attacking non-player entities
-            if (damager instanceof Player player && !canBypass(player)) {
-                e.setCancelled(true);
-                if (messageGate.canSend(player.getUniqueId())) {
-                    player.sendMessage(denyMessage);
-                }
-            }
-            // Prevent non-player entities from attacking players
-            else if (victim instanceof Player) {
-                e.setCancelled(true);
+            e.setCancelled(true);
+            if (damager instanceof Player player && messageGate.canSend(player.getUniqueId())) {
+                player.sendMessage(denyMessage);
             }
         }
     }
