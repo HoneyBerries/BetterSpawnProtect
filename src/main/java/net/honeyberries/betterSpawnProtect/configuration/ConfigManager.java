@@ -11,8 +11,10 @@ import java.util.Collections;
 import java.util.logging.Level;
 
 /**
- * Manages the plugin's configuration file (config.yml).
- * Handles loading, saving, and providing access to configuration values.
+ * Manages the plugin's configuration file, {@code config.yml}. This class follows the
+ * singleton pattern to ensure that there is only one instance of the configuration manager
+ * throughout the plugin's lifecycle. It handles loading, saving, and providing access to
+ * all configuration values, as well as creating a default configuration if one does not exist.
  */
 public class ConfigManager {
 
@@ -22,9 +24,10 @@ public class ConfigManager {
     private YamlConfiguration config;
 
     /**
-     * Private constructor to enforce the singleton pattern.
+     * Private constructor to enforce the singleton pattern. Initializes the configuration
+     * file and loads the initial values.
      *
-     * @param plugin The plugin instance.
+     * @param plugin The instance of the plugin.
      */
     private ConfigManager(Plugin plugin) {
         this.plugin = plugin;
@@ -33,10 +36,11 @@ public class ConfigManager {
     }
 
     /**
-     * Gets the singleton instance of the ConfigManager.
+     * Returns the singleton instance of the {@code ConfigManager}. If the instance does not
+     * yet exist, it is created.
      *
-     * @param plugin The plugin instance.
-     * @return The singleton ConfigManager instance.
+     * @param plugin The instance of the plugin.
+     * @return The singleton {@code ConfigManager} instance.
      */
     public static ConfigManager getInstance(Plugin plugin) {
         if (instance == null) {
@@ -46,16 +50,18 @@ public class ConfigManager {
     }
 
     /**
-     * Gets the singleton instance, assuming it has been initialized.
+     * Returns the singleton instance of the {@code ConfigManager}, assuming it has already
+     * been initialized.
      *
-     * @return The ConfigManager instance, or null if not yet initialized.
+     * @return The {@code ConfigManager} instance, or {@code null} if it has not been initialized.
      */
     public static ConfigManager getInstance() {
         return instance;
     }
 
     /**
-     * Loads the configuration from the file, creating a default if it doesn't exist.
+     * Loads the configuration from {@code config.yml}. If the file does not exist, it
+     * creates a default configuration file.
      */
     private void loadConfig() {
         if (!configFile.exists()) {
@@ -66,7 +72,8 @@ public class ConfigManager {
     }
 
     /**
-     * Creates a default configuration file with predefined values and comments.
+     * Creates a default configuration file with predefined values and descriptive comments.
+     * This method is called when the {@code config.yml} file is not found.
      */
     private void createDefaultConfig() {
         config = new YamlConfiguration();
@@ -86,7 +93,8 @@ public class ConfigManager {
     }
 
     /**
-     * Saves the current configuration to the config.yml file.
+     * Saves the current configuration to the {@code config.yml} file. If an error occurs
+     * during saving, it is logged to the console.
      */
     public void saveConfig() {
         try {
@@ -97,70 +105,71 @@ public class ConfigManager {
     }
 
     /**
-     * Reloads the configuration from the config.yml file.
+     * Reloads the configuration from the {@code config.yml} file. This is useful for
+     * applying changes without restarting the server.
      */
     public void reloadConfig() {
         config = YamlConfiguration.loadConfiguration(configFile);
     }
 
     /**
-     * Gets the name of the protected world from the configuration.
+     * Retrieves the name of the protected world from the configuration.
      *
-     * @return The name of the world.
+     * @return The name of the protected world as a {@link String}.
      */
     public String getProtectionWorldName() {
         return config.getString("protection.world", "world");
     }
 
     /**
-     * Gets the protected world from the server.
+     * Retrieves the {@link World} object corresponding to the protected world name.
      *
-     * @return The World object, or null if not found.
+     * @return The {@link World} object, or {@code null} if the world is not found.
      */
     public World getProtectionWorld() {
         return Bukkit.getWorld(getProtectionWorldName());
     }
 
     /**
-     * Gets the X coordinate of the protection center.
+     * Retrieves the X coordinate of the protection center.
      *
-     * @return The X coordinate.
+     * @return The X coordinate as a {@code double}.
      */
     public double getCenterX() {
         return config.getDouble("protection.center.x", 0.5);
     }
 
     /**
-     * Gets the Y coordinate of the protection center.
+     * Retrieves the Y coordinate of the protection center.
      *
-     * @return The Y coordinate.
+     * @return The Y coordinate as a {@code double}.
      */
     public double getCenterY() {
         return config.getDouble("protection.center.y", 64.0);
     }
 
     /**
-     * Gets the Z coordinate of the protection center.
+     * Retrieves the Z coordinate of the protection center.
      *
-     * @return The Z coordinate.
+     * @return The Z coordinate as a {@code double}.
      */
     public double getCenterZ() {
         return config.getDouble("protection.center.z", 0.5);
     }
 
     /**
-     * Gets the radius of the protected area.
+     * Retrieves the radius of the protected area.
      *
-     * @return The radius.
+     * @return The radius as a {@code double}.
      */
     public double getRadius() {
         return config.getDouble("protection.radius", 32.0);
     }
 
     /**
-     * Sets the protected world in the configuration.
+     * Sets the protected world in the configuration and saves the changes.
      *
-     * @param world The world to set as protected.
+     * @param world The {@link World} to set as protected.
      */
     public void setProtectionWorld(World world) {
         config.set("protection.world", world.getName());
@@ -168,11 +177,11 @@ public class ConfigManager {
     }
 
     /**
-     * Sets the center of the protected area in the configuration.
+     * Sets the center of the protected area in the configuration and saves the changes.
      *
-     * @param x The X coordinate.
-     * @param y The Y coordinate.
-     * @param z The Z coordinate.
+     * @param x The X coordinate of the center.
+     * @param y The Y coordinate of the center.
+     * @param z The Z coordinate of the center.
      */
     public void setCenter(double x, double y, double z) {
         config.set("protection.center.x", x);
@@ -182,7 +191,7 @@ public class ConfigManager {
     }
 
     /**
-     * Sets the radius of the protected area in the configuration.
+     * Sets the radius of the protected area in the configuration and saves the changes.
      *
      * @param radius The radius to set.
      */

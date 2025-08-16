@@ -19,22 +19,21 @@ import io.papermc.paper.math.BlockPosition;
 
 /**
  * Manages the registration and execution of commands for the BetterSpawnProtect plugin.
- * Provides commands for viewing protection info, setting the center and radius of the
- * protected area, and reloading the plugin configuration.
+ * This class provides commands for viewing protection information, setting the center
+ * and radius of the protected area, and reloading the plugin's configuration. It is
+ * designed to be used with Paper's Brigadier command system.
  */
 public class BetterSpawnProtectCommand {
 
-    // Reference to the main plugin instance
     private final BetterSpawnProtect plugin;
-
-    // Reference to the ProtectionManager for managing protection logic
     private final ProtectionManager protectionManager;
 
     /**
-     * Constructs a BetterSpawnProtectCommand with the given plugin and ProtectionManager.
+     * Constructs a new {@code BetterSpawnProtectCommand} with a reference to the main plugin
+     * instance and the {@link ProtectionManager}.
      *
-     * @param plugin The main plugin instance.
-     * @param protectionManager The ProtectionManager instance.
+     * @param plugin            The main instance of the BetterSpawnProtect plugin.
+     * @param protectionManager The manager for handling protection logic.
      */
     public BetterSpawnProtectCommand(BetterSpawnProtect plugin, ProtectionManager protectionManager) {
         this.plugin = plugin;
@@ -42,9 +41,11 @@ public class BetterSpawnProtectCommand {
     }
 
     /**
-     * Builds and returns the root command node for the BetterSpawnProtect commands.
+     * Builds and returns the root command node for all BetterSpawnProtect commands. This
+     * node serves as the entry point for all subcommands and requires the sender to have
+     * the {@code betterspawnprotect.admin} permission.
      *
-     * @return The root command node.
+     * @return The fully constructed {@link LiteralCommandNode} for the root command.
      */
     public LiteralCommandNode<CommandSourceStack> getBuildCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("betterspawnprotect")
@@ -60,9 +61,10 @@ public class BetterSpawnProtectCommand {
     }
 
     /**
-     * Creates the "info" subcommand, which displays the current protection info.
+     * Creates the "info" subcommand, which displays the current protection status,
+     * including the center coordinates and radius.
      *
-     * @return The "info" command builder.
+     * @return A {@link LiteralArgumentBuilder} for the "info" subcommand.
      */
     private LiteralArgumentBuilder<CommandSourceStack> info() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("info")
@@ -76,10 +78,11 @@ public class BetterSpawnProtectCommand {
     }
 
     /**
-     * Creates the "setcenter" subcommand, which sets the center of the protected area.
-     * Allows setting the center to the player's current location or specified coordinates.
+     * Creates the "setcenter" subcommand, allowing an admin to set the center of the
+     * protected area. If executed by a player, it uses the player's current location.
+     * It also supports specifying coordinates.
      *
-     * @return The "setcenter" command builder.
+     * @return A {@link LiteralArgumentBuilder} for the "setcenter" subcommand.
      */
     private LiteralArgumentBuilder<CommandSourceStack> setCenter() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("setcenter")
@@ -110,9 +113,10 @@ public class BetterSpawnProtectCommand {
     }
 
     /**
-     * Creates the "setradius" subcommand, which sets the radius of the protected area.
+     * Creates the "setradius" subcommand for setting the radius of the protected area.
+     * The radius must be a non-negative double value.
      *
-     * @return The "setradius" command builder.
+     * @return A {@link LiteralArgumentBuilder} for the "setradius" subcommand.
      */
     private LiteralArgumentBuilder<CommandSourceStack> setRadius() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("setradius")
@@ -128,9 +132,9 @@ public class BetterSpawnProtectCommand {
     }
 
     /**
-     * Creates the "reload" subcommand, which reloads the plugin configuration.
+     * Creates the "reload" subcommand, which reloads the plugin's configuration from disk.
      *
-     * @return The "reload" command builder.
+     * @return A {@link LiteralArgumentBuilder} for the "reload" subcommand.
      */
     private LiteralArgumentBuilder<CommandSourceStack> reload() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("reload")
@@ -142,9 +146,10 @@ public class BetterSpawnProtectCommand {
     }
 
     /**
-     * Sends a help message to the command sender, listing all available commands.
+     * Sends a formatted help message to the command sender, listing all available commands
+     * and their descriptions.
      *
-     * @param sender The command sender.
+     * @param sender The {@link CommandSender} to receive the help message.
      */
     private void sendHelp(CommandSender sender) {
         sender.sendMessage(Component.text("------------ BetterSpawnProtect Commands ------------", NamedTextColor.GOLD));
